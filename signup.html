@@ -1,0 +1,137 @@
+<!-- <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="login-container">
+        <h1>Sign Up</h1>
+        <form id="login-form">
+            <label for="username">Username:</label>
+            <input type="text" id="username" name="username" required><br><br>
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" required><br><br>
+            <label for="name">Name:</label>
+            <input type="text" id="name" name="Name" required><br><br>
+            <label for="email">Email:</label>
+            <input type="text" id="email" name="Email" required><br><br>
+            <a href="createvideo.html"><onclick button type="submit">Login</button></a>
+            
+        </form>
+        <div id="login-message"></div>
+    </div>
+    
+    <script src="script.js"></script>
+</body>
+</html> -->
+
+
+
+
+<!-- 
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <div class="login-container">
+        <h1>Sign Up</h1>
+        <form id="login-form">
+            <label for="username">Username:</label>
+            <input type="text" id="username" name="username" required><br><br>
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" required><br><br>
+            <label for="name">Name:</label>
+            <input type="text" id="name" name="Name" required><br><br>
+            <label for="email">Email:</label>
+            <input type="text" id="email" name="Email" required><br><br>
+            <button type="submit" id="login-button">Sign</button>
+        </form>
+        <div id="login-message"></div>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const loginForm = document.getElementById('login-form');
+
+            loginForm.addEventListener('submit', function (e) {
+                e.preventDefault();
+                const username = document.getElementById('username').value;
+                const password = document.getElementById('password').value;
+                if(username === 'admin' && password === 'admin')
+                alert('Admin login success')
+                else
+                alert('Login success')
+                // document.getElementById('login-message').textContent = 'Invalid Username or Password';
+                window.location.href = 'home.html';
+
+            });
+        });
+    </script>
+</body>
+
+</html>
+
+ -->
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <div class="login-container">
+        <h1>Sign Up</h1>
+        <form id="login-form">
+            <label for="username">Username:</label>
+            <input type="text" id="username" name="username" required><br><br>
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" required><br><br>
+            <label for="name">Name:</label>
+            <input type="text" id="name" name="Name" required><br><br>
+            <label for="email">Email:</label>
+            <input type="text" id="email" name="Email" required><br><br>
+            <button type="submit" id="login-button">Sign</button>
+        </form>
+        <div id="login-message"></div>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const loginForm = document.getElementById('login-form');
+
+            loginForm.addEventListener('submit', function (e) {
+                e.preventDefault();
+                const username = document.getElementById('username').value;
+                const password = document.getElementById('password').value;
+                if(username === 'admin' && password === 'admin')
+                alert('Admin login success')
+                else
+                alert('Login success')
+                // document.getElementById('login-message').textContent = 'Invalid Username or Password';
+                window.location.href = 'createvideo.html';
+
+            });
+        });
+    </script>
+</body>
+
+</html>
