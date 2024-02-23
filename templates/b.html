@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="style2.css"> -->
+    <title>User Details</title>
+    <style>
+        body {
+            background-color: black; /* Changed to black background */
+            color: aqua; /* Changed text color to green */
+            text-align: center;
+            font: 1em sans-serif;
+        }
+        div {
+            text-align: center;
+            padding-bottom: 50%;
+            font-size: 40px;
+        }
+        p {
+            color:aqua; /* Changed paragraph text color to green */
+            margin-top: 20px; /* Added margin to paragraphs */
+        }
+    </style>
+</head>
+<body>
+   <div>
+    <h1>User Details</h1>
+    <p>Email: {{ user.email }}</p>
+    <p>Name: {{ user.name }}</p>
+    <p>Password: {{ user.password }}</p>
+   </div>
+</body>
+</html>
