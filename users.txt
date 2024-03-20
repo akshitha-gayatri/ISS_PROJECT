@@ -1,5 +1,0 @@
-{"name": "1", "email": "123@gmail.com", "password": "$2b$12$y.0IL3k./DbZv.ZvcfXEsORLqgmraS05GcfIfQogVv756.Ycrgwaq"}
-<form action="/upload" method="POST" enctype="multipart/form-data">
-        <input type="file" name="images" multiple>
-        <input type="submit" value="Upload">
-    </form>
