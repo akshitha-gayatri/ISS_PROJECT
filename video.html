@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video Page</title>
+    <style>
+        body {
+            background-color: #111;
+            color: aqua; /* Green text */
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        h1, h2 {
+            color:aqua; /* Green headers */
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        li img {
+            width: 100px; /* Adjust image width as needed */
+            height: auto; /* Maintain aspect ratio */
+        }
+        #selected-images-preview {
+            margin-top: 20px;
+        }
+        /* Add additional styles as needed */
+    </style>
+</head>
+<body>
+    <h1>Video Page</h1>
+
+    <div id="selected-images-preview">
+        <h2>Selected Images:</h2>
+        <ul id="selected-images-list"></ul>
+    </div>
+
+    <!-- Add any additional content or features for your video page -->
+
+    <script>
+        // Retrieve selected images from local storage
+        const selectedImages = JSON.parse(localStorage.getItem('selectedImages')) || [];
+
+        // Display selected images on the page
+        const selectedImagesContainer = document.getElementById('selected-images-list');
+        selectedImages.forEach(imageSrc => {
+            const listItem = document.createElement('li');
+            const imgElement = document.createElement('img');
+            imgElement.src = imageSrc;
+            imgElement.alt = 'Selected Image';
+            listItem.appendChild(imgElement);
+            selectedImagesContainer.appendChild(listItem);
+        });
+
+        // Clear local storage after loading selected images
+        localStorage.removeItem('selectedImages');
+    </script>
+
+    <!-- Add any additional scripts or libraries needed for your video page -->
+</body>
+</html>
