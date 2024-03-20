@@ -4,29 +4,38 @@ import bcrypt
 import mysql.connector
 import jwt  
 import base64
-import time
+import time  
+import cv2
+import numpy as np
+from io import BytesIO
+from PIL import Image  # Import Pillow for image processing
+import base64  # Import for base64 encoding
+from urllib.request import urlretrieve
 import io
+import os
+from moviepy.editor import ImageSequenceClip,concatenate_videoclips,ImageClip
+import moviepy.editor
 app = Flask(__name__)
 
 app.secret_key = '$$$$##)($'
 db = mysql.connector.connect(
     host="localhost",
-    user="root",
+    user="Nikhil",
     password="Nikhil@1234",
     database="mydatabase"
-    )
-cursor = db.cursor()
+)
+cursor =db.cursor()
 app.config['MYSQL_HOST'] = 'localhost'
-app.config['MYSQL_USER'] = 'root'
+app.config['MYSQL_USER'] = 'Nikhil'
 app.config['MYSQL_PASSWORD'] = 'Nikhil@1234'
 app.config['MYSQL_DB'] = 'mydatabase'
-
 mysq = mysql.connector.connect(
     host=app.config['MYSQL_HOST'],
     user=app.config['MYSQL_USER'],
     password=app.config['MYSQL_PASSWORD'],
     database=app.config['MYSQL_DB']
 )
+
 
 @app.route('/display')
 def display():
@@ -54,7 +63,7 @@ def display():
 
 db_params = {
     'host': 'localhost',
-    'user': 'root',
+    'user': 'Nikhil',
     'password': 'Nikhil@1234',
     'database': 'mydatabase'
 }
@@ -105,7 +114,7 @@ def dis():
 from flask import jsonify  # Add this import for JSON responses
 def generate_jwt_token(username):
     payload = {'username': username}
-    secret_key = '@#23$%^'
+    secret_key = '$$$$##)($'
     expiration_time = 36000  # Set your desired expiration time in seconds
     token = jwt.encode({'exp': time.time() + expiration_time, **payload}, secret_key, algorithm='HS256')
     # Store token and user details in the session
@@ -117,31 +126,38 @@ def generate_jwt_token(username):
 def upload():
     user_details = session.get('user_details')
     token = session.get('jwt_token')
-    if user_details :
+    if user_details:
         username = user_details['username']
         payload = verify_jwt_token(token)
         if payload and payload['username'] == username:
             user_data = find_user_details(username)
             print(user_data)
     if request.method == 'POST':
+        print("yes")
         images = request.files.getlist('images')
+        # print(images)
         try:
+            cursor=mysq.cursor()
+            # print(images)
             for image in images:
-                # Convert the image file to bytes
                 image_bytes = image.read()
-                # Insert image into the database
-                cursor = mysq.cursor()
-                cursor.execute("INSERT INTO Images (user_id, image_metadata, image, user_name) VALUES (%s, %s, %s, %s)",
-                               (1, 'Metadata', image_bytes, username))
+                # print(image_bytes)
+                # print(username)
+                cursor.execute("""
+                    INSERT INTO Images (image, user_name)
+                    VALUES (%s, %s)""", ((image_bytes), username))
+                print("oo\n")
                 mysq.commit()
-                cursor.close()
+            cursor.close()
+            # mysq.connect().close()
+            print("iMages uploaded")
             return redirect(url_for('uploadedimages'))
         except Exception as e:
             return f'An error occurred: {str(e)}'
     return 'No images were uploaded'
 
 def verify_jwt_token(token):
-    secret_key = '@#23$%^'  # Replace with the same key used for encoding
+    secret_key = '$$$$##)($'
     try:
         payload = jwt.decode(token, secret_key, algorithms=['HS256'])
         return payload
@@ -150,26 +166,32 @@ def verify_jwt_token(token):
     except jwt.InvalidTokenError:
         return None 
 
-@app.route('/login', methods=['POST', 'GET'])
+@app.route("/login", methods=["POST", "GET"])
 def login():
-    if request.method == 'POST':
+    if request.method == "POST":
         username = request.form.get("username")
         password = request.form.get("password")
         cursor = db.cursor()
+        if username == "admin" and password == "admin":
+            # Fetch all usernames and emails from the database
+            cursor.execute("SELECT Username, Email FROM users")
+            users = [{'username': row[0], 'email': row[1]} for row in cursor.fetchall()]
+            return render_template('admin.html', users=users)
         query = f'SELECT * FROM users WHERE Username="{username}"'
         cursor.execute(query)
         data = cursor.fetchone()
         if data and bcrypt.checkpw(password.encode(), data[2].encode()):
-            # Generate JWT token and redirect to success route
-            user_info = generate_jwt_token(username)
-            session['user_details'] = {'username': username}
-            session['jwt_token'] = user_info['token']
-            return redirect(url_for('success'))
+                # Generate JWT token and redirect to success route
+                user_info = generate_jwt_token(username)
+                session["user_details"] = {"username": username}
+                session["jwt_token"] = user_info["token"]
+                return redirect(url_for("success"))
         else:
             flash("Invalid credentials", "error")
-            return render_template('m.html')
-    session.pop('_flashes', None) 
-    return render_template('m.html')
+            return render_template("m.html")
+    session.pop("_flashes", None)
+    return render_template("m.html")
+
 def find_user_details(user_id):
     cursor.execute("SELECT * FROM users WHERE username = %s", (user_id,))
     user_data = cursor.fetchone()
@@ -214,6 +236,7 @@ def display_page():
 
 @app.route('/uploadedimages',methods=['GET','POST'])
 def uploadedimages():
+    print("uploaded\n")
     user_details = session.get('user_details')
     token = session.get('jwt_token')
     if user_details :
@@ -225,6 +248,7 @@ def uploadedimages():
     cursor = mysq.cursor()
     cursor.execute("SELECT image FROM Images WHERE user_name = %s", (username,))
     image_data = cursor.fetchall()
+    print(image_data)
     cursor.close()
     uploaded_images = []
     for data in image_data:
@@ -252,7 +276,7 @@ def register():
         # Insert the new user if the username is unique
         cursor.execute("INSERT INTO users (username, email, password) VALUES (%s, %s, %s)",
                        (username, email, hash_password))
-        db.commit()
+        mysq.commit()
         cursor.execute("SELECT * FROM users WHERE username = %s", (username,))
         data1 = cursor.fetchone()
         user_data = {'username': data1[1], 'email': data1[3], 'password': data1[2]}
@@ -267,12 +291,61 @@ def register():
 def logout():
     session.clear()
     return render_template('m.html')
-@app.route('/create_video', methods=[ 'GET' ,'POST'])
+
+def generate_video(selected_images, photo_duration=2):
+    temp_dir = 'temp_images'
+    # Create the temporary directory if it doesn't exist
+    os.makedirs(temp_dir, exist_ok=True)
+    # Convert images to PNG format and save them in the temporary directory
+    image_paths = []
+    for i, image_data in enumerate(selected_images):
+        try:
+            # Extract the base64 encoded data (if applicable)
+            if ',' in image_data:
+                _, encoded_data = image_data.split(',')
+                image_data = base64.b64decode(encoded_data)
+            else:
+                image_path = os.path.join(temp_dir, f'image_{i}.png')
+                urlretrieve(image_data, image_path)  # Download image if URL
+            image_path = os.path.join(temp_dir, f'image_{i}.png')
+            with open(image_path, 'wb') as f:
+                f.write(image_data)
+            image_paths.append(image_path)
+        except Exception as e:
+            print(f"Error saving image {i}: {e}")
+    # Create video from image sequence with individual clip durations
+    clips = []
+    for image_path in image_paths:
+        clip = ImageClip(image_path).set_duration(photo_duration)
+        clips.append(clip)
+    clip = concatenate_videoclips(clips)
+    # Generate video filename with timestamp for uniqueness
+    video_filename = f'output_video_{int(time.time())}.mp4'  # Import time for timestamp
+    video_path = os.path.join(temp_dir, video_filename)
+    clip.write_videofile(video_path,fps=24)
+    # Cleanup temporary images
+    for filename in os.listdir(temp_dir):
+        if filename.endswith('.png') and filename != video_filename:
+            os.remove(os.path.join(temp_dir, filename))
+    # Read the generated video as bytes
+    with open(video_path, 'rb') as f:
+        video_data = f.read()
+        video_data_base64 = base64.b64encode(video_data).decode('utf-8')
+    return jsonify({'videoData': video_data_base64})
+
+@app.route('/create_video', methods=['POST'])
 def create_video():
-    data = request.get_json()
-    selected_images = data.get('selectedImages', [])
-    session['selected_images'] = selected_images
-    return jsonify({'message': 'Video created successfully'})
+    try:
+        selected_images = request.json.get('selectedImages', [])
+        if len(selected_images) > 0:
+            print(len(selected_images),end="\n")
+            video_data = generate_video(selected_images)
+            return video_data
+        else:
+            return jsonify({'error': 'No images provided'}), 400  # Handle missing images
+    except Exception as e:
+        print(f"Error creating video: {e}")
+        return jsonify({'error': 'Internal server error'}), 500  # Handle internal errors                                                                                    
 
 @app.route('/video',methods=['GET','POST'])
 def video():
